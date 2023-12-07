@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "1053302494726",
+    "firebase_url": "https://vt332-9e71d-default-rtdb.firebaseio.com",
+    "project_id": "vt332-9e71d",
+    "storage_bucket": "vt332-9e71d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1053302494726:android:4ae921374558edb0a11587",
+        "android_client_info": {
+          "package_name": "com.example.vt332"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCaNi2_cFkOfwnIx0bV1v_gYooOORppPHo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
