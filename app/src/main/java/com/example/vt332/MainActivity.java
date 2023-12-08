@@ -244,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
                                 m++;
                                 lecsMap.put(iten.getKey().toString(),Double.parseDouble(iten.child("lecturas").child(Agno).child(Mes).getValue().toString()));
                                 LecTOT=LecTOT+Double.parseDouble(iten.child("lecturas").child(Agno).child(Mes).getValue().toString());
-                                if(m==7) setServicios3a();
+                                if(m==8) setServicios3a();
                             }
                         }if (m<7)Toast.makeText(getApplicationContext(),"te falta algun depa",Toast.LENGTH_SHORT).show();
                     }
@@ -268,7 +268,7 @@ public class MainActivity extends AppCompatActivity {
                         m++;
                         lecsMap2.put(iten.getKey().toString(),Double.parseDouble(iten.child("lecturas").child(anuel).child("12").getValue().toString()));
                         LecTOT2=LecTOT2+Double.parseDouble(iten.child("lecturas").child(anuel).child("12").getValue().toString());
-                        if (m==7) setServicios3();
+                        if (m==8) setServicios3();
                     }
                 }
                 @Override
@@ -286,7 +286,7 @@ public class MainActivity extends AppCompatActivity {
                         lecsMap2.put(iten.getKey().toString(),Double.parseDouble(iten.child("lecturas").child(Agno).
                                 child(Integer.toString(Integer.parseInt(Mes)-1)).getValue().toString()));
                         LecTOT2=LecTOT2+Double.parseDouble(iten.child("lecturas").child(Agno).child(Integer.toString(Integer.parseInt(Mes)-1)).getValue().toString());
-                        if (m==7) setServicios3();
+                        if (m==8) setServicios3();
                     }
                 }
                 @Override
@@ -298,7 +298,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setServicios3() {
         double coble=0;
-        double intelnet=Minternet/7;
+        double intelnet=Minternet/8;
         if(cabre.equalsIgnoreCase("1")){
             coble=Mcable/nroCables;
         }
@@ -307,8 +307,8 @@ public class MainActivity extends AppCompatActivity {
         iluz=lecsMap.get(spUnidad.getSelectedItem().toString())-lecsMap2.get(spUnidad.getSelectedItem().toString());
         double eluz=LecTOT-LecTOT2+LecCuartos-LecCuartos2;
 
-        double luz=iluz/eluz*MontoEdesa;
-        double totServices=agua+gas+coble+intelnet+luz;
+        double luz=iluz/eluz*(MontoEdesa-Mimpuestos);
+        double totServices=gas+agua+coble+intelnet+luz;
         txtservicios.setText(Double.toString(totServices));
     }
 
