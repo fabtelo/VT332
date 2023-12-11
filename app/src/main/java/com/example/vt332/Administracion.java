@@ -40,6 +40,7 @@ public class Administracion extends AppCompatActivity {
     private ArrayList<String> arrayInmueble,arrayGasto;
     private ArrayList<Double> arrayIngresos,arrayEgresos;
     private double dbGastos,dbIngresos;
+    private String STingresos;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,16 +89,17 @@ public class Administracion extends AppCompatActivity {
         nodox.child("unidades").child("depas").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+
                 for(DataSnapshot item:snapshot.getChildren()){
                     arrayInmueble.add(item.getKey().toString());
-                    if(item.child("pagos").child(Anio).child(Mies).child("Alquiler").exists()) arrayIngresos.
-                            add(Double.parseDouble(item.child("pagos").child(Anio).child(Mies).child("Alquiler").getValue().toString()));
+                    if(item.child("pagos").child(Anio).child(Mies).child("Alquiler").exists())
+                        arrayIngresos.add(Double.parseDouble(item.child("pagos").child(Anio).child(Mies).child("Alquiler").getValue().toString()));
                     else arrayIngresos.add(0.0);
-                    if(item.child("pagos").child(Anio).child(Mies).child("Deposito").exists()) arrayIngresos.
-                            add(Double.parseDouble(item.child("pagos").child(Anio).child(Mies).child("Deposito").getValue().toString()));
+                    if(item.child("pagos").child(Anio).child(Mies).child("Deposito").exists())
+                        arrayIngresos.add(Double.parseDouble(item.child("pagos").child(Anio).child(Mies).child("Deposito").getValue().toString()));
                     else arrayIngresos.add(0.0);
-                    if(item.child("pagos").child(Anio).child(Mies).child("Servicios").exists()) arrayIngresos.
-                            add(Double.parseDouble(item.child("pagos").child(Anio).child(Mies).child("Servicios").getValue().toString()));
+                    if(item.child("pagos").child(Anio).child(Mies).child("Servicios").exists())
+                        arrayIngresos.add(Double.parseDouble(item.child("pagos").child(Anio).child(Mies).child("Servicios").getValue().toString()));
                     else arrayIngresos.add(0.0);
                 }seteaIngresos3();
             }
@@ -110,18 +112,38 @@ public class Administracion extends AppCompatActivity {
     }
 
     private void seteaIngresos3() {
+        STingresos="";
         dbIngresos=0;
+        int ii=0;
         for(double ing:arrayIngresos){
             dbIngresos=dbIngresos+ing;
         }
-        Toast.makeText(this,Double.toString(dbIngresos),Toast.LENGTH_SHORT).show();
+        for(int i=0;i<8;i++){
+            STingresos=STingresos+arrayInmueble.get(i).toString()+"\n";
+            for (int e=ii;e<ii+2;e++){
+                STingresos=STingresos+"     "+arrayIngresos.get(e).toString()+"\n";
+            }ii=ii+2;
+        }
+
+        int ee=22;
+        for (int i=10;i<16;i++){
+            STingresos=STingresos+arrayInmueble.get(i).toString()+"\n";
+            for (int e=ee;e<ee+3;e++){
+                STingresos=STingresos+"     "+arrayIngresos.get(e).toString()+"\n";
+            }ee=ee+3;
+        }
+        /*String prueba="";
+        for(Double e:arrayIngresos){
+            prueba=prueba+Double.toString(e)+"\n";
+        }*/
+        txtingresos.setText(STingresos+"\n"+"total= "+dbIngresos);
     }
 
     private void botonaso() {
         if(ETmonto.getText().toString().length()==0&&ETmotivo.getText().toString().length()==0){
             finish();
         }else {
-            nodox.child("balance").child(anio.toString()).child(mies.toString()).child(ETmotivo.getText().toString()).setValue(ETmonto.getText().toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
+            nodox.child("balance").child(Anio).child(Mies).child(ETmotivo.getText().toString()).setValue(ETmonto.getText().toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                    ETmonto.setText(null);
