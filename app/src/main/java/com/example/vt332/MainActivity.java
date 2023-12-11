@@ -1,10 +1,11 @@
 package com.example.vt332;
 
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
-import android.graphics.Color;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -18,7 +19,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -26,7 +26,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -69,7 +68,11 @@ public class MainActivity extends AppCompatActivity {
     private HashMap<String,Double> lecsMap2=new HashMap<>();
     private double MontoEdesa, LecturaEdesa,LecturaEdesa2,LecCuartos,LecCuartos2,LecTOT,LecTOT2,Magua,Mgas;
     private double Mcable,Minternet,Mimpuestos;
-
+//variables para deudores
+    private String deudores="";
+    private String deudores2="";
+//declarando variables para mostrar deudores
+    private ArrayList<String> arrayCuartos,arrayDepas;
     //metodo on create
     @SuppressLint("MissingInflatedId")
     @Override
@@ -78,6 +81,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         getNroInq();
         getNroCable();
+        seteaDeudores();
+        arrayCuartos=new ArrayList<>();
+        arrayDepas=new ArrayList<>();
+        seteaArrayDeudores();
 //instanciando views para datos especificos de cada inquilino
         spTipoInm=findViewById(R.id.spinner);
         spUnidad=findViewById(R.id.spinner2);
@@ -166,6 +173,17 @@ public class MainActivity extends AppCompatActivity {
                 setServicios();
             }
         });
+    }
+
+    private void seteaArrayDeudores() {
+        for(int i=1;i<9;i++){
+            arrayCuartos.add("CUARTO "+i);
+        }
+        arrayDepas.add("DEPARTAMENTO 1");
+        arrayDepas.add("DEPARTAMENTO 2");
+        for (int i=1;i<7;i++){
+            arrayDepas.add("MONO "+i);
+        }
     }
 
     private void setServicios() {
@@ -309,7 +327,7 @@ public class MainActivity extends AppCompatActivity {
 
         double luz=iluz/eluz*(MontoEdesa-Mimpuestos);
         double totServices=gas+agua+coble+intelnet+luz;
-        txtservicios.setText(Double.toString(totServices));
+        txtservicios.setText(Double.toString(Math.round(totServices*100.0)));
     }
 
     private void setLectura() {
@@ -420,8 +438,14 @@ public class MainActivity extends AppCompatActivity {
             nodo.child("servicios").child(Agno).child(Mes).child("LAG").child("agua").child("monto").setValue(ETmontAgu.getText().toString());
             nodo.child("servicios").child(Agno).child(Mes).child("LAG").child("gas").child("lectura").setValue(ETlecGas.getText().toString());
             nodo.child("servicios").child(Agno).child(Mes).child("LAG").child("gas").child("monto").setValue(ETmontoGas.getText().toString());
-        }else Toast.makeText(this,"falta ingresar algun dato",Toast.LENGTH_SHORT).show();
+        }else irAdministracion();
     }
+
+    private void irAdministracion() {
+        Intent intent=new Intent(this, Administracion.class);
+        startActivity(intent);
+    }
+
     private void getNroInq(){
         nroInqs=0;
         nodo.child("unidades").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -475,5 +499,64 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+    private void seteaDeudores(){
+        nodo.child("unidades").child("cuartos").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                int m=0;
+                for(DataSnapshot item:snapshot.getChildren()){
+                    if(item.child("pagos").child(Agno).child(Mes).exists()){
+                        arrayCuartos.set(m,"");
+                    }m++;
+                }seteaDeudores2();
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+    }
+
+    private void seteaDeudores2() {
+        nodo.child("unidades").child("depas").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                int m=0;
+                for(DataSnapshot item:snapshot.getChildren()){
+                    if(item.child("pagos").child(Agno).child(Mes).child("Alquiler").exists()){
+                        arrayDepas.set(m,"");
+                    }m++;
+                }seteaDeudores3();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void seteaDeudores3() {
+        int n=1;
+        int l=1;
+        for(int i=0;i<8;i++){
+            if(n%2==0){
+                deudores=deudores+arrayCuartos.get(i)+"\n";
+                n++;
+            }else{
+                deudores=deudores+arrayCuartos.get(i)+" ";
+                n++;
+            }
+        }
+        for(int i=0;i<8;i++){
+            if(l%2==0){
+                deudores2=deudores2+arrayDepas.get(i)+"\n";
+                l++;
+            }else{
+                deudores2=deudores2+arrayDepas.get(i)+" ";
+                l++;
+            }
+        }
+        txtMorosos.setText(deudores+deudores2);
     }
 }
