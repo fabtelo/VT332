@@ -5,9 +5,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -36,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private Spinner spTipoInm,spUnidad,spGlosa;
     private EditText ETnombre,ETnroPersonas,ETfingreso,ETpago;
     private EditText ETlectura;
-    private TextView txtservicios;
+    private TextView txtservicios,txtEdesa;
     private Switch zwitch;
     private String cabre;
 //declarando views para servicios
@@ -73,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
     private String deudores2="";
 //declarando variables para mostrar deudores
     private ArrayList<String> arrayCuartos,arrayDepas;
-    //metodo on create
+//metodo on create
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +86,13 @@ public class MainActivity extends AppCompatActivity {
         seteaDeudores();
         arrayCuartos=new ArrayList<>();
         arrayDepas=new ArrayList<>();
+        txtEdesa=findViewById(R.id.textView);
+        txtEdesa.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                esconderKeyboard();
+            }
+        });
         seteaArrayDeudores();
 //instanciando views para datos especificos de cada inquilino
         spTipoInm=findViewById(R.id.spinner);
@@ -173,6 +182,7 @@ public class MainActivity extends AppCompatActivity {
                 setServicios();
             }
         });
+
     }
 
     private void seteaArrayDeudores() {
@@ -335,12 +345,20 @@ public class MainActivity extends AppCompatActivity {
         if(ETlectura.getText().toString().length()>2){
             if(zwitch.isChecked()){
                 nodo.child("unidades").child(spTipoInm.getSelectedItem().toString()).child(spUnidad.getSelectedItem().toString()).child("cable").setValue("1");
-            }else nodo.child("unidades").child(spTipoInm.getSelectedItem().toString()).child(spUnidad.getSelectedItem().toString()).child("cable").setValue("0");
+                esconderKeyboard();
+            }else {
+                nodo.child("unidades").child(spTipoInm.getSelectedItem().toString()).child(spUnidad.getSelectedItem().toString()).child("cable").setValue("0");
+                esconderKeyboard();
+            }
 
             if(spTipoInm.getSelectedItem().toString().equalsIgnoreCase("depas")){
                 nodo.child("unidades").child(spTipoInm.getSelectedItem().toString()).child(spUnidad.getSelectedItem().toString()).child("lecturas").
                         child(Agno).child(Mes).setValue(ETlectura.getText().toString());
-            }else nodo.child("servicios").child(Agno).child(Mes).child("CII").child("cuartos").setValue(ETlectura.getText().toString());
+                esconderKeyboard();
+            }else {
+                nodo.child("servicios").child(Agno).child(Mes).child("CII").child("cuartos").setValue(ETlectura.getText().toString());
+                esconderKeyboard();
+            }
 
         }else Toast.makeText(this,"ingrese lectura de medidor",Toast.LENGTH_SHORT).show();
     }
@@ -357,6 +375,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     ETpago.setText("");
+                    esconderKeyboard();
                 }
             });
         }else Toast.makeText(this,"ingrese monto de pago",Toast.LENGTH_SHORT).show();
@@ -426,18 +445,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setServiciosGrales(){
-        HashMap<String,Object> map=new HashMap<>();
         if(ETmontoElec.getText().length()>2&&ETmontAgu.getText().length()>2&&ETmontoGas.getText().length()>2){
-            map.put("cable",ETcable.getText().toString());
-            map.put("wifi",ETintern.getText().toString());
-            map.put("impuestos",ETimp.getText().toString());
-            nodo.child("servicios").child(Agno).child(Mes).child("CII").setValue(map);
+            nodo.child("servicios").child(Agno).child(Mes).child("CII").child("cable").setValue(ETcable.getText().toString());
+            nodo.child("servicios").child(Agno).child(Mes).child("CII").child("wifi").setValue(ETintern.getText().toString());
+            nodo.child("servicios").child(Agno).child(Mes).child("CII").child("impuestos").setValue(ETimp.getText().toString());
             nodo.child("servicios").child(Agno).child(Mes).child("LAG").child("electricidad").child("lectura").setValue(ETlecElec.getText().toString());
             nodo.child("servicios").child(Agno).child(Mes).child("LAG").child("electricidad").child("monto").setValue(ETmontoElec.getText().toString());
             nodo.child("servicios").child(Agno).child(Mes).child("LAG").child("agua").child("lectura").setValue(ETlecAgu.getText().toString());
             nodo.child("servicios").child(Agno).child(Mes).child("LAG").child("agua").child("monto").setValue(ETmontAgu.getText().toString());
             nodo.child("servicios").child(Agno).child(Mes).child("LAG").child("gas").child("lectura").setValue(ETlecGas.getText().toString());
             nodo.child("servicios").child(Agno).child(Mes).child("LAG").child("gas").child("monto").setValue(ETmontoGas.getText().toString());
+            esconderKeyboard();
         }else irAdministracion();
     }
 
@@ -559,4 +577,12 @@ public class MainActivity extends AppCompatActivity {
         }
         txtMorosos.setText(deudores+deudores2);
     }
+    private void esconderKeyboard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+
 }
