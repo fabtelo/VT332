@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +29,7 @@ public class Administracion extends AppCompatActivity {
     private Button btnregistrar;
     private TextView txtingresos,txtegresos;
     private String stIngreso,stEgresos,stBalance;
+    private Switch suitch;
 //seteo variables fechas
     private Date fecha=new Date();
     private SimpleDateFormat anio=new SimpleDateFormat("YYYY");
@@ -37,15 +39,16 @@ public class Administracion extends AppCompatActivity {
 //seteo nodo firebase
     private DatabaseReference nodox=FirebaseDatabase.getInstance().getReference();
 //seteo arrays para ingresos y egresos
-    private ArrayList<String> arrayInmueble,arrayGasto;
-    private ArrayList<Double> arrayIngresos,arrayEgresos;
-    private double dbGastos,dbIngresos;
+    private ArrayList<String> arrayInmueble,arrayGasto,arrayGasto2;
+    private ArrayList<Double> arrayIngresos,arrayEgresos,arrayEgresos2;
+    private double dbGastos,dbIngresos,dbGiros,dbTotal;
     private String STingresos;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_administracion);
         seteaIngresos();
+        suitch=findViewById(R.id.switch2);
         ETmonto=findViewById(R.id.editTextText15);
         ETmotivo=findViewById(R.id.editTextText4);
         btnregistrar=findViewById(R.id.button3);
@@ -60,6 +63,8 @@ public class Administracion extends AppCompatActivity {
         arrayInmueble=new ArrayList<>();
         arrayIngresos=new ArrayList<>();
         arrayEgresos=new ArrayList<>();
+        arrayEgresos2=new ArrayList<>();
+        arrayGasto2=new ArrayList<>();
         arrayGasto=new ArrayList<>();
     }
 
@@ -132,25 +137,95 @@ public class Administracion extends AppCompatActivity {
                 STingresos=STingresos+"     "+arrayIngresos.get(e).toString()+"\n";
             }ee=ee+3;
         }
-        /*String prueba="";
-        for(Double e:arrayIngresos){
-            prueba=prueba+Double.toString(e)+"\n";
-        }*/
         txtingresos.setText(STingresos+"\n"+"total= "+dbIngresos);
+        seteoEgresos();
+    }
+
+    private void seteoEgresos() {
+        dbGastos=0;
+        nodox.child("balance").child(Anio).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.child(Mies).child("gastos").exists()) {
+                    for(DataSnapshot item:snapshot.child(Mies).child("gastos").getChildren()){
+                        arrayGasto.add(item.getKey().toString());
+                        arrayEgresos.add(Double.parseDouble(item.getValue().toString()));
+                        dbGastos=dbGastos+Double.parseDouble(item.getValue().toString());
+                    }
+                }seteoEgresos2();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void seteoEgresos2() {
+        dbGiros=0;
+        nodox.child("balance").child(Anio).child(Mies).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.child("giros").exists()){
+                    for(DataSnapshot item:snapshot.getChildren()){
+                        arrayGasto2.add(item.getKey().toString());
+                        arrayEgresos2.add(Double.parseDouble(item.getValue().toString()));
+                        dbGiros=dbGiros+Double.parseDouble(item.getValue().toString());
+                    }
+                }seteoEgresos3();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void seteoEgresos3() {
+        String stBalance="";
+        String stBalance2="";
+        dbTotal=dbGiros+dbGastos;
+        if (arrayGasto.size()>0){
+            for (int i=0;i<arrayEgresos.size();i++){
+                stBalance=stBalance+arrayGasto.get(i).toString()+"\n"+ "   "+ Double.toString(arrayEgresos.get(i))+"\n";
+            }
+        }else Toast.makeText(this,"no hay gastos registrados",Toast.LENGTH_SHORT).show();
+
+        if(arrayGasto2.size()>0){
+            int ii=0;
+            for (String i:arrayGasto2){
+                stBalance2=stBalance2+arrayGasto2.get(ii).toString()+"\n"+"    "+Double.toString(arrayEgresos.get(ii))+"\n";
+                ii++;
+            }
+        }else Toast.makeText(this,"no gay giros registrados",Toast.LENGTH_SHORT).show();
+        txtegresos.setText(stBalance+"\n"+"Gastos= "+dbGastos+"\n"+"\n"+"GIROS= "+dbGiros+"\n"+"\n"+"TOTAL= "+dbTotal);
     }
 
     private void botonaso() {
         if(ETmonto.getText().toString().length()==0&&ETmotivo.getText().toString().length()==0){
             finish();
         }else {
-            nodox.child("balance").child(Anio).child(Mies).child(ETmotivo.getText().toString()).setValue(ETmonto.getText().toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                   ETmonto.setText(null);
-                   ETmotivo.setText(null);
-                   seteaIngresos();
-                }
-            });
+            if (suitch.isChecked()){
+                nodox.child("balance").child(Anio).child(Mies).child("giros").child(ETmotivo.getText().toString()).setValue(ETmonto.getText().toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        ETmonto.setText(null);
+                        ETmotivo.setText(null);
+                        seteaIngresos();
+                    }
+                });
+            }else {
+                nodox.child("balance").child(Anio).child(Mies).child("gastos").child(ETmotivo.getText().toString()).setValue(ETmonto.getText().toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        ETmonto.setText(null);
+                        ETmotivo.setText(null);
+                        seteaIngresos();
+                    }
+                });
+            }
         }
     }
 
