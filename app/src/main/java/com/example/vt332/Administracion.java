@@ -168,10 +168,12 @@ public class Administracion extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.child("giros").exists()){
-                    for(DataSnapshot item:snapshot.getChildren()){
+                    for(DataSnapshot item:snapshot.child("gastos").getChildren()){
                         arrayGasto2.add(item.getKey().toString());
                         arrayEgresos2.add(Double.parseDouble(item.getValue().toString()));
-                        dbGiros=dbGiros+Double.parseDouble(item.getValue().toString());
+                    }
+                    for (DataSnapshot iten:snapshot.child("giros").getChildren()){
+                        dbGiros=dbGiros+Double.parseDouble(iten.getValue().toString());
                     }
                 }seteoEgresos3();
             }
