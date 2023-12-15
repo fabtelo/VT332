@@ -39,8 +39,8 @@ public class Administracion extends AppCompatActivity {
 //seteo nodo firebase
     private DatabaseReference nodox=FirebaseDatabase.getInstance().getReference();
 //seteo arrays para ingresos y egresos
-    private ArrayList<String> arrayInmueble,arrayGasto,arrayGasto2;
-    private ArrayList<Double> arrayIngresos,arrayEgresos,arrayEgresos2;
+    private ArrayList<String> arrayInmueble,arrayGasto,arrayGasto2,arrayGiros;
+    private ArrayList<Double> arrayIngresos,arrayEgresos,arrayEgresos2,arraDbgiros;
     private double dbGastos,dbIngresos,dbGiros,dbTotal;
     private String STingresos;
     @Override
@@ -60,6 +60,8 @@ public class Administracion extends AppCompatActivity {
                 botonaso();
             }
         });
+        arrayGiros=new ArrayList<>();
+        arraDbgiros=new ArrayList<>();
         arrayInmueble=new ArrayList<>();
         arrayIngresos=new ArrayList<>();
         arrayEgresos=new ArrayList<>();
@@ -174,6 +176,8 @@ public class Administracion extends AppCompatActivity {
                     }
                     for (DataSnapshot iten:snapshot.child("giros").getChildren()){
                         dbGiros=dbGiros+Double.parseDouble(iten.getValue().toString());
+                        arrayGiros.add(iten.getKey().toString());
+                        arraDbgiros.add(Double.parseDouble(iten.getValue().toString()));
                     }
                 }seteoEgresos3();
             }
@@ -188,6 +192,7 @@ public class Administracion extends AppCompatActivity {
     private void seteoEgresos3() {
         String stBalance="";
         String stBalance2="";
+        String stGiros="";
         dbTotal=dbGiros+dbGastos;
         if (arrayGasto.size()>0){
             for (int i=0;i<arrayEgresos.size();i++){
@@ -197,12 +202,16 @@ public class Administracion extends AppCompatActivity {
 
         if(arrayGasto2.size()>0){
             int ii=0;
+            for (int e=0;e<arrayGiros.size();e++){
+                //Toast.makeText(this,""+arrayGasto.get(e),Toast.LENGTH_SHORT).show();
+                stGiros=stGiros+arrayGiros.get(e).toString()+"="+arraDbgiros.get(e).toString()+"\n";
+            }
             for (String i:arrayGasto2){
                 stBalance2=stBalance2+arrayGasto2.get(ii).toString()+"\n"+"    "+Double.toString(arrayEgresos.get(ii))+"\n";
                 ii++;
             }
         }else Toast.makeText(this,"no gay giros registrados",Toast.LENGTH_SHORT).show();
-        txtegresos.setText(stBalance+"\n"+"Gastos= "+dbGastos+"\n"+"\n"+"GIROS= "+dbGiros+"\n"+"\n"+"TOTAL= "+dbTotal);
+        txtegresos.setText(stBalance+"\n"+"Gastos= "+dbGastos+"\n"+"\n"+"GIROS= "+dbGiros+"\n"+"\n"+stGiros+"\n"+"TOTAL= "+dbTotal+"\n\n"+"CAJA="+(dbIngresos-dbGastos-dbGiros));
     }
 
     private void botonaso() {
