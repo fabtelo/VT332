@@ -189,8 +189,8 @@ public class MainActivity extends AppCompatActivity {
         for(int i=1;i<9;i++){
             arrayCuartos.add("CUARTO "+i);
         }
-        arrayDepas.add("DEPARTAMENTO 1");
-        arrayDepas.add("DEPARTAMENTO 2");
+        arrayDepas.add("DEPA 1");
+        arrayDepas.add("DEPA 2");
         for (int i=1;i<7;i++){
             arrayDepas.add("MONO "+i);
         }
@@ -337,7 +337,7 @@ public class MainActivity extends AppCompatActivity {
 
         double luz=iluz/eluz*(MontoEdesa-Mimpuestos);
         double totServices=gas+agua+coble+intelnet+luz;
-        txtservicios.setText(Double.toString(Math.round(totServices*100.0)));
+        txtservicios.setText(Double.toString(Math.round(totServices*1.0)));
     }
 
     private void setLectura() {
@@ -558,24 +558,32 @@ public class MainActivity extends AppCompatActivity {
         int n=1;
         int l=1;
         for(int i=0;i<8;i++){
-            if(n%2==0){
-                deudores=deudores+arrayCuartos.get(i)+"\n";
-                n++;
-            }else{
-                deudores=deudores+arrayCuartos.get(i)+" ";
-                n++;
+            int x=0;
+            if (arrayCuartos.get(i).equalsIgnoreCase(""))x=1;
+            if (x==0){
+                if(n%2==0){
+                    deudores=deudores+arrayCuartos.get(i)+"\n";
+                    n++;
+                }else{
+                    deudores=deudores+arrayCuartos.get(i)+" ";
+                    n++;
+                }
             }
         }
         for(int i=0;i<8;i++){
-            if(l%2==0){
-                deudores2=deudores2+arrayDepas.get(i)+"\n";
-                l++;
-            }else{
-                deudores2=deudores2+arrayDepas.get(i)+" ";
-                l++;
+            int y=0;
+            if (arrayDepas.get(i).equalsIgnoreCase(""))y=1;
+            if (y==0){
+                if(l%2==0){
+                    deudores2=deudores2+arrayDepas.get(i)+"\n";
+                    l++;
+                }else{
+                    deudores2=deudores2+arrayDepas.get(i)+" ";
+                    l++;
+                }
             }
         }
-        txtMorosos.setText(deudores+deudores2);
+        txtMorosos.setText(deudores+"\n"+deudores2);
     }
     private void esconderKeyboard() {
         View view = this.getCurrentFocus();

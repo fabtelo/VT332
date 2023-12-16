@@ -126,17 +126,31 @@ public class Administracion extends AppCompatActivity {
             dbIngresos=dbIngresos+ing;
         }
         for(int i=0;i<8;i++){
+            int x=0;
+            String alquiler="alq= ";
+            String deposito="dep= ";
             STingresos=STingresos+arrayInmueble.get(i).toString()+"\n";
             for (int e=ii;e<ii+2;e++){
-                STingresos=STingresos+"     "+arrayIngresos.get(e).toString()+"\n";
+                if (Double.parseDouble(arrayIngresos.get(e).toString())>0){
+                    if (x==0) STingresos=STingresos+alquiler+arrayIngresos.get(e).toString()+"\n";
+                    if (x==1) STingresos=STingresos+deposito+arrayIngresos.get(e).toString()+"\n";
+                }x++;
             }ii=ii+2;
         }
 
         int ee=22;
         for (int i=10;i<16;i++){
+            int x=0;
+            String alquiler="alq= ";
+            String deposito="dep= ";
+            String servicios="serv= ";
             STingresos=STingresos+arrayInmueble.get(i).toString()+"\n";
             for (int e=ee;e<ee+3;e++){
-                STingresos=STingresos+"     "+arrayIngresos.get(e).toString()+"\n";
+                if (arrayIngresos.get(e)>0){
+                    if (x==0) STingresos=STingresos+alquiler+arrayIngresos.get(e).toString()+"\n";
+                    if (x==1) STingresos=STingresos+deposito+arrayIngresos.get(e).toString()+"\n";
+                    if (x==2) STingresos=STingresos+servicios+arrayIngresos.get(e).toString()+"\n";
+                }x++;
             }ee=ee+3;
         }
         txtingresos.setText(STingresos+"\n"+"total= "+dbIngresos);
