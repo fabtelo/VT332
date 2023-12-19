@@ -83,7 +83,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         getNroInq();
         getNroCable();
-        seteaDeudores();
         arrayCuartos=new ArrayList<>();
         arrayDepas=new ArrayList<>();
         txtEdesa=findViewById(R.id.textView);
@@ -186,6 +185,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void seteaArrayDeudores() {
+        arrayDepas.clear();
+        arrayCuartos.clear();
         for(int i=1;i<9;i++){
             arrayCuartos.add("CUARTO "+i);
         }
@@ -194,6 +195,7 @@ public class MainActivity extends AppCompatActivity {
         for (int i=1;i<7;i++){
             arrayDepas.add("MONO "+i);
         }
+        seteaDeudores();
     }
 
     private void setServicios() {
@@ -222,12 +224,18 @@ public class MainActivity extends AppCompatActivity {
                 LecCuartos=Double.parseDouble(snapshot.child("CII").child("cuartos").getValue().toString());
                 Minternet=Double.parseDouble(snapshot.child("CII").child("wifi").getValue().toString());
                 Mimpuestos=Double.parseDouble(snapshot.child("CII").child("impuestos").getValue().toString());
+                muestraServicios();
                 setServicios2a();
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }
         });
+    }
+
+    private void muestraServicios() {
+        double tot=(Magua+Mgas+MontoEdesa+Mcable+Minternet)*1.0;
+        Toast.makeText(this,"servicios sin claro cuartos= "+tot,Toast.LENGTH_SHORT).show();
     }
 
     private void setServicios2a() {
@@ -376,6 +384,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onComplete(@NonNull Task<Void> task) {
                     ETpago.setText("");
                     esconderKeyboard();
+                    seteaArrayDeudores();
                 }
             });
         }else Toast.makeText(this,"ingrese monto de pago",Toast.LENGTH_SHORT).show();
@@ -555,6 +564,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void seteaDeudores3() {
+        deudores="";
+        deudores2="";
         int n=1;
         int l=1;
         for(int i=0;i<8;i++){

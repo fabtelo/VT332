@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -68,6 +69,19 @@ public class Administracion extends AppCompatActivity {
         arrayEgresos2=new ArrayList<>();
         arrayGasto2=new ArrayList<>();
         arrayGasto=new ArrayList<>();
+
+        suitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b){
+                    Toast.makeText(getApplicationContext(),"Estas registrando un GIRO",Toast.LENGTH_SHORT).show();
+                    ETmonto.setHint("giro");
+                }else {
+                    Toast.makeText(getApplicationContext(),"GASTO",Toast.LENGTH_SHORT).show();
+                    ETmonto.setHint("gasto");
+                }
+            }
+        });
     }
 
     private void seteaIngresos() {
@@ -158,6 +172,10 @@ public class Administracion extends AppCompatActivity {
     }
 
     private void seteoEgresos() {
+        arrayGasto.clear();
+        arrayEgresos.clear();
+        arrayEgresos2.clear();
+        arrayGasto2.clear();
         dbGastos=0;
         nodox.child("balance").child(Anio).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -179,6 +197,8 @@ public class Administracion extends AppCompatActivity {
     }
 
     private void seteoEgresos2() {
+        arrayGiros.clear();
+        arraDbgiros.clear();
         dbGiros=0;
         nodox.child("balance").child(Anio).child(Mies).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -238,7 +258,7 @@ public class Administracion extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Void> task) {
                         ETmonto.setText(null);
                         ETmotivo.setText(null);
-                        seteaIngresos();
+                        seteoEgresos();
                     }
                 });
             }else {
@@ -247,7 +267,7 @@ public class Administracion extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Void> task) {
                         ETmonto.setText(null);
                         ETmotivo.setText(null);
-                        seteaIngresos();
+                        seteoEgresos();
                     }
                 });
             }
