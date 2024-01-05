@@ -13,6 +13,9 @@
         android:theme="@style/Theme.VT332"
         tools:targetApi="31">
         <activity
+            android:name=".ActivityRegistros"
+            android:exported="false" />
+        <activity
             android:name=".Administracion"
             android:exported="false" />
         <activity

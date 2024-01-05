@@ -34,7 +34,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
-    private Button btnPago,btnLectura,btnServicios;
+    private Button btnPago,btnLectura,btnServicios,btnRegistros;
     private Spinner spTipoInm,spUnidad,spGlosa;
     private EditText ETnombre,ETnroPersonas,ETfingreso,ETpago;
     private EditText ETlectura;
@@ -155,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
         btnPago=findViewById(R.id.button);
         btnLectura=findViewById(R.id.button2);
         btnServicios=findViewById(R.id.botonServicios);
+        btnRegistros=findViewById(R.id.button4);
 
         btnPago.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -174,6 +175,12 @@ public class MainActivity extends AppCompatActivity {
                 setServiciosGrales();
             }
         });
+        btnRegistros.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                irRegistro();
+            }
+        });
 //agnadiendo accion al texto
         txtservicios.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -182,6 +189,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void irRegistro() {
+        Intent intent=new Intent(this, ActivityRegistros.class);
+        startActivity(intent);
     }
 
     private void seteaArrayDeudores() {
