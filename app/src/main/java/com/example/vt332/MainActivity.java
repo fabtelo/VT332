@@ -66,10 +66,12 @@ public class MainActivity extends AppCompatActivity {
     private double nroCables;
     private double nroInqs,nro;
     private double iluz;
+    private double lectCuart2;
     private HashMap<String,Double> lecsMap=new HashMap<>();
     private HashMap<String,Double> lecsMap2=new HashMap<>();
     private double MontoEdesa, LecturaEdesa,LecturaEdesa2,LecCuartos,LecCuartos2,LecTOT,LecTOT2,Magua,Mgas;
     private double Mcable,Minternet,Mimpuestos;
+    private double nroInqCuartos;
 //variables para deudores
     private String deudores="";
     private String deudores2="";
@@ -251,6 +253,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setServicios2a() {
+
         if(Integer.parseInt(Mes)==1){
             int agnoz=Integer.parseInt(Agno)-1;
             nodo.child("servicios").child(Integer.toString(agnoz)).child("12").child("CII").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -279,13 +282,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setServicios2b() {
-        if(spTipoInm.getSelectedItem().toString().equalsIgnoreCase("cuartos"))txtservicios.setText("es un cuarto, no paga");
-        if(spTipoInm.getSelectedItem().toString().equalsIgnoreCase("depas")){
-            LecTOT=0;
+
+        LecTOT=0;
             nodo.child("unidades").child("depas").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if(snapshot.child(spUnidad.getSelectedItem().toString()).child("lecturas").child(Agno).child(Mes).exists()){
+                        int m=0;
+                        for (DataSnapshot iten:snapshot.getChildren()){
+                            if(iten.child("lecturas").child(Agno).child(Mes).exists()){
+                                m++;
+                                lecsMap.put(iten.getKey().toString(),Double.parseDouble(iten.child("lecturas").child(Agno).child(Mes).getValue().toString()));
+                                LecTOT=LecTOT+Double.parseDouble(iten.child("lecturas").child(Agno).child(Mes).getValue().toString());
+                                if(m==8) setServicios3a();
+                            }
+                        }if (m<7)Toast.makeText(getApplicationContext(),"te falta algun depa",Toast.LENGTH_SHORT).show();
+                    }else if (spTipoInm.getSelectedItem().toString().equalsIgnoreCase("cuartos")){
                         int m=0;
                         for (DataSnapshot iten:snapshot.getChildren()){
                             if(iten.child("lecturas").child(Agno).child(Mes).exists()){
@@ -301,11 +313,13 @@ public class MainActivity extends AppCompatActivity {
                 public void onCancelled(@NonNull DatabaseError error) {
                 }
             });
-        }
+
     }
 
     private void setServicios3a() {
-        if(Mes.equalsIgnoreCase("1")){
+        //Toast.makeText(this,"servicios 3a",Toast.LENGTH_SHORT).show();
+
+        if(Mes.equalsIgnoreCase("01")){
             nodo.child("unidades").child("depas").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -318,6 +332,7 @@ public class MainActivity extends AppCompatActivity {
                         LecTOT2=LecTOT2+Double.parseDouble(iten.child("lecturas").child(anuel).child("12").getValue().toString());
                         if (m==8) setServicios3();
                     }
+                    if(m<8) Toast.makeText(getApplicationContext(),"faltan lecturas",Toast.LENGTH_SHORT).show();
                 }
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
@@ -336,6 +351,7 @@ public class MainActivity extends AppCompatActivity {
                         LecTOT2=LecTOT2+Double.parseDouble(iten.child("lecturas").child(Agno).child(Integer.toString(Integer.parseInt(Mes)-1)).getValue().toString());
                         if (m==8) setServicios3();
                     }
+                    if(m<8) Toast.makeText(getApplicationContext(),"faltan lecturas",Toast.LENGTH_SHORT).show();
                 }
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
@@ -344,20 +360,73 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("SuspiciousIndentation")
     private void setServicios3() {
-        double coble=0;
-        double intelnet=Minternet/8;
-        if(cabre.equalsIgnoreCase("1")){
-            coble=Mcable/nroCables;
-        }
-        double agua=Magua/nroInqs*Integer.parseInt(ETnroPersonas.getText().toString());
-        double gas=Mgas/nroInqs*Integer.parseInt(ETnroPersonas.getText().toString());
-        iluz=lecsMap.get(spUnidad.getSelectedItem().toString())-lecsMap2.get(spUnidad.getSelectedItem().toString());
-        double eluz=LecTOT-LecTOT2+LecCuartos-LecCuartos2;
+        //Toast.makeText(this,"servicuartos",Toast.LENGTH_SHORT).show();
+            if(spTipoInm.getSelectedItem().toString().equalsIgnoreCase("cuartos")) serviCuartos();
 
-        double luz=iluz/eluz*(MontoEdesa-Mimpuestos);
-        double totServices=gas+agua+coble+intelnet+luz;
-        txtservicios.setText(Double.toString(Math.round(totServices*1.0)));
+            if(spTipoInm.getSelectedItem().toString().equalsIgnoreCase("depas")) {
+                double coble = 0;
+                double intelnet = Minternet / 8;
+                if (cabre.equalsIgnoreCase("1")) {
+                    coble = Mcable / nroCables;
+                }
+                double agua = Magua / nroInqs * Integer.parseInt(ETnroPersonas.getText().toString());
+                double gas = Mgas / nroInqs * Integer.parseInt(ETnroPersonas.getText().toString());
+                iluz = lecsMap.get(spUnidad.getSelectedItem().toString()) - lecsMap2.get(spUnidad.getSelectedItem().toString());
+                double eluz = LecTOT - LecTOT2 + LecCuartos - LecCuartos2;
+
+                double luz = iluz / eluz * (MontoEdesa - Mimpuestos);
+                double totServices = gas + agua + coble + intelnet + luz;
+                txtservicios.setText(Double.toString(Math.round(totServices * 1.0)));
+                //Toast.makeText(this,"= "+LecTOT2,Toast.LENGTH_SHORT).show();
+
+            }
+
+    }
+
+    private void serviCuartos() {
+        //Toast.makeText(this,"servicuartos",Toast.LENGTH_SHORT).show();
+        if(Mes.equalsIgnoreCase("01")){
+            nodo.child("servicios").child(Integer.toString(Integer.parseInt(Agno)-1)).child("12").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    lectCuart2=Double.parseDouble(snapshot.child("CII").child("cuartos").getValue().toString());
+                    serviCuartos2();
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        }else{
+            nodo.child("servicios").child(Agno).child(Double.toString(Double.parseDouble(Mes)-1)).child("CII").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    lectCuart2=Double.parseDouble(snapshot.child("cuartos").getValue().toString());
+                    serviCuartos2();
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        }
+    }
+
+    private void serviCuartos2() {
+        double intelnet = Minternet/2;
+        double agua = Magua / nroInqs * nroInqCuartos;
+        double gas = Mgas / nroInqs * nroInqCuartos;
+        iluz = LecCuartos - lectCuart2;
+        double eluz = LecTOT - LecTOT2 + LecCuartos - LecCuartos2;
+
+        double luz = iluz / eluz * (MontoEdesa - Mimpuestos);
+        double totServices = gas + agua + intelnet + luz;
+        txtservicios.setText(Double.toString(Math.round(totServices * 1.0)));
+        //Toast.makeText(this,"="+nroInqCuartos,Toast.LENGTH_SHORT).show();
     }
 
     private void setLectura() {
@@ -487,10 +556,16 @@ public class MainActivity extends AppCompatActivity {
 
     private void getNroInq(){
         nroInqs=0;
+        nroInqCuartos=0;
         nodo.child("unidades").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for(DataSnapshot item:snapshot.getChildren()){
+                    if(item.getKey().toString().equalsIgnoreCase("cuartos")){
+                        for (DataSnapshot ritem:item.getChildren()){
+                            nroInqCuartos=nroInqCuartos+Double.parseDouble(ritem.child("nro").getValue().toString());
+                        }
+                    }
                     nodo.child("unidades").child(item.getKey().toString()).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
