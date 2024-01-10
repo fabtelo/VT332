@@ -442,10 +442,22 @@ public class MainActivity extends AppCompatActivity {
 
             if(spTipoInm.getSelectedItem().toString().equalsIgnoreCase("depas")){
                 nodo.child("unidades").child(spTipoInm.getSelectedItem().toString()).child(spUnidad.getSelectedItem().toString()).child("lecturas").
-                        child(Agno).child(Mes).setValue(ETlectura.getText().toString());
+                        child(Agno).child(Mes).setValue(ETlectura.getText().toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                ETlectura.setText(null);
+                                Toast.makeText(getApplicationContext(),"Lectura de medidor registrada",Toast.LENGTH_SHORT).show();
+                            }
+                        });
                 esconderKeyboard();
             }else {
-                nodo.child("servicios").child(Agno).child(Mes).child("CII").child("cuartos").setValue(ETlectura.getText().toString());
+                nodo.child("servicios").child(Agno).child(Mes).child("CII").child("cuartos").setValue(ETlectura.getText().toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        ETlectura.setText(null);
+                        Toast.makeText(getApplicationContext(),"Lectura de medidor registrada",Toast.LENGTH_SHORT).show();
+                    }
+                });
                 esconderKeyboard();
             }
 
@@ -544,7 +556,20 @@ public class MainActivity extends AppCompatActivity {
             nodo.child("servicios").child(Agno).child(Mes).child("LAG").child("agua").child("lectura").setValue(ETlecAgu.getText().toString());
             nodo.child("servicios").child(Agno).child(Mes).child("LAG").child("agua").child("monto").setValue(ETmontAgu.getText().toString());
             nodo.child("servicios").child(Agno).child(Mes).child("LAG").child("gas").child("lectura").setValue(ETlecGas.getText().toString());
-            nodo.child("servicios").child(Agno).child(Mes).child("LAG").child("gas").child("monto").setValue(ETmontoGas.getText().toString());
+            nodo.child("servicios").child(Agno).child(Mes).child("LAG").child("gas").child("monto").setValue(ETmontoGas.getText().toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    ETcable.setText(null);
+                    ETimp.setText(null);
+                    ETintern.setText(null);
+                    ETlecElec.setText(null);
+                    ETmontoElec.setText(null);
+                    ETlecAgu.setText(null);
+                    ETmontAgu.setText(null);
+                    ETlecGas.setText(null);
+                    ETmontoGas.setText(null);
+                }
+            });
             esconderKeyboard();
         }else irAdministracion();
     }
